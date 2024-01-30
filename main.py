@@ -5,8 +5,6 @@
 import flet as ft
 import requests
 
-from kivy.app import App
-from kivy.lang import Builder
 from flet import Text, TextField, FilledButton, Row
 from datetime import date, datetime
 
@@ -20,18 +18,15 @@ def main(pagina: ft.Page):
 
     pagina.theme_mode = ft.ThemeMode.DARK 
 
-    global temptext2
-    global temptext
-    temptext = ft.Text("Temperatura: aguardando...")
     global rastrear3
     global rastrear2
     rastrear2 = ft.Text("OBJETO STATUS: aguardando...")
+
     hora_atual = datetime.now()
     global hora
     hora = hora_atual.strftime('%H:%M:%S')
 
-    def correios(code2):
-        
+    def correios(code2):  
         url = f'https://api.linketrack.com/track/json?user=teste&token=1abcd00b2731640e886fb41a8a9671ad1434c599dbaa0a0de9a5aa619f29a83f&codigo={code2}'
         requisition = requests.get(url)
         if requisition.status_code == 429 or requisition.status_code ==  401:
@@ -57,24 +52,28 @@ def main(pagina: ft.Page):
 	        "X-RapidAPI-Host": "booking-com15.p.rapidapi.com"
         }
         response = requests.get(url, headers=headers, params=querystring)
-        flight_requisition = response.json()
-        flight_valor = flight_requisition["data"]["flightDeals"][0]["price"]["units"]
-        return flight_valor
+        if response.status_code == 429 or response.status_code ==  401:
+            return(f'  ERRO: {response.status_code} -\n {response.text}')
+        else:   
+            flight_requisition = response.json()
+            flight_valor = flight_requisition["data"]["flightDeals"][0]["price"]["units"]
+            return flight_valor
 
     def temperatura():
-        global temptext
-        global temptext2
         global hora
-        currentTemp = 30.2
-        tempHigh = 40.7
-        tempLow = -18.9
-        if currentTemp > tempLow and currentTemp < tempHigh:
-            pagina.remove(temptext2)
-            temptext = ft.Text(f"Hoje dia: {date.today()} às {hora} a temperatura atual é: {str(currentTemp)} graus, está entre o extremo alto e extremo baixo")
-            temptext2 = ft.Row([temptext], alignment=ft.MainAxisAlignment.CENTER)
-            pagina.insert(3,temptext2)
-            pagina.update()
-
+        urltemp = "https://open-weather13.p.rapidapi.com/city/erechim,%20brazil"
+        headerstemp = {
+	        "X-RapidAPI-Key": "48bbb58dfdmshb1718674f5b879ap105aaajsn5936fc8b7282",
+	        "X-RapidAPI-Host": "open-weather13.p.rapidapi.com"
+        }
+        response2 = requests.get(urltemp, headers=headerstemp)
+        temp_requisition = response2.json()
+        temp_valor = temp_requisition["main"]["temp"]
+        F = float(temp_valor)
+        C = (F - 32) * (5 / 9)
+        temp_C = int(C)
+        return temp_C
+        
     def adicionar2(e):
         global rastrear2
         global rastrear3
@@ -82,7 +81,6 @@ def main(pagina: ft.Page):
             caixa_texto.error_text = "Digite o código de rastreio"
             pagina.update()
         else:
-            temperatura()
             pagina.remove(rastrear3)
             rastrear2 = ft.Text(f"OBJETO STATUS: {correios(caixa_texto.value)}")
             rastrear3 = ft.Row([rastrear2], alignment=ft.MainAxisAlignment.CENTER)
@@ -100,25 +98,27 @@ def main(pagina: ft.Page):
 
     # criar os itens que queremos na página
 
-    botao_add_codigo = ft.ElevatedButton("Procurar", on_click=adicionar2)
+    botao_add_codigo = ft.ElevatedButton('Procurar', on_click=adicionar2)
 
-    caixa_texto = ft.TextField(label="Aqui vai o codigo", width=250, height=50, text_align=ft.TextAlign.CENTER)
+    caixa_texto = ft.TextField(label='Aqui vai o codigo', width=250, height=50, text_align=ft.TextAlign.CENTER)
 
-    dolares = ft.Text(f"Dólar R${pegar_cotacao('USD')}")
+    dolares = ft.Text(f'Dólar R${pegar_cotacao('USD')}')
 
     flight_txt = ft.Text(f'O valor do voo para o dia 21/12/2024 (2 pessoas) está em R${flight()}')
+
+    temp_txt = ft.Text(f'Hoje dia: {date.today()} às {hora} a temperatura atual é: {temperatura()}° graus!')
 
     # adicinar os itens na página
 
     rastrear3 = ft.Row([rastrear2], alignment=ft.MainAxisAlignment.CENTER)
-    temptext2 = ft.Row([temptext], alignment=ft.MainAxisAlignment.CENTER)
+    temp_txt2 = ft.Row([temp_txt], alignment=ft.MainAxisAlignment.CENTER)
 
     pagina.add(
 
     ft.Row([caixa_texto, botao_add_codigo], alignment=ft.MainAxisAlignment.CENTER),
     rastrear3,
     ft.Row([dolares], alignment=ft.MainAxisAlignment.CENTER),
-    temptext2,
+    temp_txt2,
     ft.Row([flight_txt], alignment=ft.MainAxisAlignment.CENTER)
     )
 
