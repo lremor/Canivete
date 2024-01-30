@@ -111,14 +111,13 @@ def main(pagina: ft.Page):
     # adicinar os itens na página
 
     rastrear3 = ft.Row([rastrear2], alignment=ft.MainAxisAlignment.CENTER)
-    temp_txt2 = ft.Row([temp_txt], alignment=ft.MainAxisAlignment.CENTER)
 
     pagina.add(
 
     ft.Row([caixa_texto, botao_add_codigo], alignment=ft.MainAxisAlignment.CENTER),
     rastrear3,
     ft.Row([dolares], alignment=ft.MainAxisAlignment.CENTER),
-    temp_txt2,
+    ft.Row([temp_txt], alignment=ft.MainAxisAlignment.CENTER),
     ft.Row([flight_txt], alignment=ft.MainAxisAlignment.CENTER)
     )
 
