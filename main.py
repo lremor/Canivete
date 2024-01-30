@@ -33,8 +33,8 @@ def main(pagina: ft.Page):
             return(f"{requisition.status_code} - {requisition.text}")
         else:   
             dic_requisition = requisition.json()
-            numero = dic_requisition["eventos"][0]["status"]
-            return numero
+            codigo = dic_requisition["eventos"][0]["status"]
+            return codigo
     pagina.update()
   
     def pegar_cotacao(moeda):
@@ -86,17 +86,8 @@ def main(pagina: ft.Page):
             rastrear3 = ft.Row([rastrear2], alignment=ft.MainAxisAlignment.CENTER)
             pagina.insert(1,rastrear3)
             pagina.update()
-          
 
-        ### def do botao
-            
-        ## def chamabotao(o):
-        ## temperatura()
-        ## adicionar2()
-        ## return
-
-
-    # criar os itens que queremos na página
+    # criar os itens que queremos na página   
 
     botao_add_codigo = ft.ElevatedButton('Procurar', on_click=adicionar2)
 
@@ -108,7 +99,7 @@ def main(pagina: ft.Page):
 
     temp_txt = ft.Text(f'Hoje dia: {date.today()} às {hora} a temperatura atual é: {temperatura()}° graus!')
 
-    # adicinar os itens na página
+     # adicinar os itens na página
 
     rastrear3 = ft.Row([rastrear2], alignment=ft.MainAxisAlignment.CENTER)
 
